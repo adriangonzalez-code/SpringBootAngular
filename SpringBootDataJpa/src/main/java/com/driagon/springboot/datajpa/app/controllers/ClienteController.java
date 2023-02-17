@@ -2,6 +2,7 @@ package com.driagon.springboot.datajpa.app.controllers;
 
 import com.driagon.springboot.datajpa.app.models.dao.IClienteDao;
 import com.driagon.springboot.datajpa.app.models.entity.Cliente;
+import com.driagon.springboot.datajpa.app.models.service.IClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -15,20 +16,18 @@ import org.springframework.web.bind.support.SessionStatus;
 
 import javax.validation.Valid;
 import java.util.Map;
-import java.util.Objects;
 
 @Controller
 @SessionAttributes("cliente")
 public class ClienteController {
 
     @Autowired
-    @Qualifier("clienteDaoJpa")
-    private IClienteDao clienteDao;
+    private IClienteService clienteService;
 
     @RequestMapping(value = "/listar", method = RequestMethod.GET)
     public String listar(Model model) {
         model.addAttribute("titulo", "Listado de Clientes");
-        model.addAttribute("clientes", this.clienteDao.findAll());
+        model.addAttribute("clientes", this.clienteService.findAll());
 
         return "listar";
     }
@@ -48,7 +47,7 @@ public class ClienteController {
             return "form";
         }
 
-        this.clienteDao.save(cliente);
+        this.clienteService.save(cliente);
         status.setComplete();
         return "redirect:/listar";
     }
@@ -59,7 +58,7 @@ public class ClienteController {
         Cliente cliente = null;
 
         if (id > 0) {
-            cliente = this.clienteDao.findOne(id);
+            cliente = this.clienteService.findOne(id);
         } else {
             return "redirect:/listar";
         }
@@ -68,5 +67,14 @@ public class ClienteController {
         model.put("cliente", cliente);
 
         return "form";
+    }
+
+    @RequestMapping(value = "/eliminar/{id}")
+    public String eliminar(@PathVariable Long id) {
+        if (id > 0) {
+            this.clienteService.delete(id);
+        }
+
+        return "redirect:/listar";
     }
 }

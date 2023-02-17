@@ -1,10 +1,10 @@
-package com.driagon.springboot.datajpa.app.models.dao;
+package com.driagon.springboot.datajpa.app.models.service;
 
 import com.driagon.springboot.datajpa.app.models.entity.Cliente;
 
 import java.util.List;
 
-public interface IClienteDao {
+public interface IClienteService {
 
     public List<Cliente> findAll();
 
