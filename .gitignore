@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+
+SpringBootDataJpa/src/main/resources/import.sql
