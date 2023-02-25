@@ -25,12 +25,24 @@ INSERT INTO clientes(nombre, apellido, email, create_at, foto) VALUES('Miguel', 
 INSERT INTO clientes(nombre, apellido, email, create_at, foto) VALUES('Pancho', 'Villa', 'juan@mail.com', '2018-06-12', '');
 INSERT INTO clientes(nombre, apellido, email, create_at, foto) VALUES('Juan', 'Pérez', 'juan@mail.com', '2018-06-12', '');
 INSERT INTO clientes(nombre, apellido, email, create_at, foto) VALUES('Gustavo', 'A. Madero', 'juan@mail.com', '2018-06-12', '');
-INSERT INTO clientes(nombre, apellido, email, create_at, foto) VALUES('Juan', 'Pérez', 'juan@mail.com', '2018-06-12', '');
-INSERT INTO clientes(nombre, apellido, email, create_at, foto) VALUES('Juan', 'Pérez', 'juan@mail.com', '2018-06-12', '');
-INSERT INTO clientes(nombre, apellido, email, create_at, foto) VALUES('Juan', 'Pérez', 'juan@mail.com', '2018-06-12', '');
-INSERT INTO clientes(nombre, apellido, email, create_at, foto) VALUES('Juan', 'Pérez', 'juan@mail.com', '2018-06-12', '');
-INSERT INTO clientes(nombre, apellido, email, create_at, foto) VALUES('Juan', 'Pérez', 'juan@mail.com', '2018-06-12', '');
-INSERT INTO clientes(nombre, apellido, email, create_at, foto) VALUES('Juan', 'Pérez', 'juan@mail.com', '2018-06-12', '');
-INSERT INTO clientes(nombre, apellido, email, create_at, foto) VALUES('Juan', 'Pérez', 'juan@mail.com', '2018-06-12', '');
-INSERT INTO clientes(nombre, apellido, email, create_at, foto) VALUES('Juan', 'Pérez', 'juan@mail.com', '2018-06-12', '');
-INSERT INTO clientes(nombre, apellido, email, create_at, foto) VALUES('Juan', 'Pérez', 'juan@mail.com', '2018-06-12', '');
+
+INSERT INTO productos(nombre, precio, create_at) VALUES('Sony Xperia 10 IV', 8125, NOW());
+INSERT INTO productos(nombre, precio, create_at) VALUES('Sony Xperia 5 III', 18357, NOW());
+INSERT INTO productos(nombre, precio, create_at) VALUES('Samsung A53', 7354, NOW());
+INSERT INTO productos(nombre, precio, create_at) VALUES('Samsung A03', 2678, NOW());
+INSERT INTO productos(nombre, precio, create_at) VALUES('Fiio F15', 2541, NOW());
+INSERT INTO productos(nombre, precio, create_at) VALUES('Audifonos Fiio', 1987, NOW());
+INSERT INTO productos(nombre, precio, create_at) VALUES('Panasonic Pantalla LCD', 259990, NOW());
+INSERT INTO productos(nombre, precio, create_at) VALUES('Sony Cámara Digital', 123490, NOW());
+INSERT INTO productos(nombre, precio, create_at) VALUES('Apple iPod shuffle', 1499990, NOW());
+INSERT INTO productos(nombre, precio, create_at) VALUES('Sony Notebook', 374990, NOW());
+INSERT INTO productos(nombre, precio, create_at) VALUES('Mica Comoda 5 Cajones', 299990, NOW());
+INSERT INTO productos(nombre, precio, create_at) VALUES('Bianchi Bicicleta Aro 26', 69990, NOW());
+
+INSERT INTO facturas (descripcion, observacion, cliente_id, create_at) VALUES('Factura equipos de oficina', null, 1, NOW());
+INSERT INTO facturas_item (cantidad, factura_id, producto_id) VALUES(1, 1, 10);
+INSERT INTO facturas_item (cantidad, factura_id, producto_id) VALUES(2, 1, 7);
+INSERT INTO facturas_item (cantidad, factura_id, producto_id) VALUES(1, 1, 8);
+
+INSERT INTO facturas (descripcion, observacion, cliente_id, create_at) VALUES('Factura Bicicleta', 'Alguna nota importante!', 1, NOW());
+INSERT INTO facturas_item (cantidad, factura_id, producto_id) VALUES(3, 2, 12);

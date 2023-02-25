@@ -7,12 +7,15 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "clientes")
 public class Cliente implements Serializable {
 
+    private static final long serialVersionUID = -771492852705313080L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,7 +42,13 @@ public class Cliente implements Serializable {
     @Column(name = "foto")
     private String foto;
 
-    /*@PrePersist
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "cliente", orphanRemoval = true)
+    private List<Factura> facturas;
+
+    public Cliente() {
+        facturas = new ArrayList<>();
+    }
+/*@PrePersist
     public void prePersist() {
         createAt = new Date();
     }*/
@@ -90,5 +99,17 @@ public class Cliente implements Serializable {
 
     public void setFoto(String foto) {
         this.foto = foto;
+    }
+
+    public List<Factura> getFacturas() {
+        return facturas;
+    }
+
+    public void setFacturas(List<Factura> facturas) {
+        this.facturas = facturas;
+    }
+
+    public void addFactura(Factura factura) {
+        facturas.add(factura);
     }
 }
