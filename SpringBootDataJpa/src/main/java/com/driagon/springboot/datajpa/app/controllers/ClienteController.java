@@ -4,6 +4,8 @@ import com.driagon.springboot.datajpa.app.models.entity.Cliente;
 import com.driagon.springboot.datajpa.app.models.service.IClienteService;
 import com.driagon.springboot.datajpa.app.models.service.IUploadFileService;
 import com.driagon.springboot.datajpa.app.util.paginator.PageRender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -11,6 +13,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,11 +29,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Collection;
 import java.util.Map;
 
 @Controller
 @SessionAttributes("cliente")
 public class ClienteController {
+
+    protected final Logger logger = LoggerFactory.getLogger(ClienteController.class);
 
     @Autowired
     private IClienteService clienteService;
@@ -51,7 +61,24 @@ public class ClienteController {
     }
 
     @RequestMapping(value = {"/listar", "/", ""}, method = RequestMethod.GET)
-    public String listar(@RequestParam(name = "page", defaultValue = "0") int page,  Model model) {
+    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model, Authentication authentication) {
+
+        if (authentication != null) {
+            logger.info("Hola usuario autenticado, tu username es: {}", authentication.getName());
+        }
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth != null) {
+            logger.info("Utilizando forma estática 'SecurityContextHolder.getContext().getAuthentication()': Usuario autenticado, username es: {}", auth.getName());
+        }
+
+        if (hasRole("ROLE_ADMIN")) {
+            logger.info("Hola {} tienes acceso!", auth.getName());
+        } else {
+            logger.info("Hola {} no tienes acceso!", auth.getName());
+        }
+
         Pageable pageRequest = PageRequest.of(page, 5);
         Page<Cliente> clientes = this.clienteService.findAll(pageRequest);
 
@@ -151,5 +178,32 @@ public class ClienteController {
         }
 
         return "redirect:/listar";
+    }
+
+    private boolean hasRole(String role) {
+        SecurityContext context = SecurityContextHolder.getContext();
+
+        if (context == null) {
+            return false;
+        }
+
+        Authentication auth = context.getAuthentication();
+
+        if (auth == null) {
+            return false;
+        }
+
+        Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
+
+        /*for (GrantedAuthority authority : authorities) {
+            if (role.equals(authority.getAuthority())) {
+                logger.info("Hola {} tu rol es {}", auth.getName(), authority.getAuthority());
+                return true;
+            }
+        }
+
+        return false;*/
+
+        return authorities.contains(new SimpleGrantedAuthority(role));
     }
 }

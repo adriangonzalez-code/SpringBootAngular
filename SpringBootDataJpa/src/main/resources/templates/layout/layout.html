@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
   <head th:fragment="head">
       <meta charset="UTF-8" />
       <title th:text="'Spring Boot : MVC + Thymeleaf + Data JPA - ' + ${titulo}"></title>
@@ -23,6 +23,19 @@
               <a class="nav-link" th:href="@{/listar}">Clientes</a>
             </li>
           </ul>
+          <ul class="navbar-nav navbar-right">
+            <li sec:authorize="!isAuthenticated()">
+              <a th:href="@{/login}" class="btn btn-outline-primary">Sign In</a>
+            </li>
+            <li sec:authorize="isAuthenticated()" class="dropdown">
+              <button class="btn btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false" sec:authentication="name"></button>
+              <div class="dropdown-menu">
+                <form id="logoutForm" th:action="@{/logout}" method="post">
+                  <buttton type="submit" class="dropdown-item" onclick="document.getElementById('logoutForm').submit();">Sign Out</buttton>
+                </form>
+              </div>
+            </li>
+          </ul>
         </div>
       </nav>
       <div th:if="${success != null}" class="alert alert-success" th:text="${success}"></div>
@@ -34,6 +47,9 @@
     <footer th:fragment="footer" class="container">
       <hr>
       <img th:src="@{/images/spring.png}" alt="" class="img img-thumbnail" style="width: 5%">
+      <p sec:authorize="isAuthenticated()">
+        Usuario logeado: <span sec:authentication="name"></span> | Roles: <span sec:authentication="principal.authorities"></span>
+      </p>
       <p>
         Powered by <a href="">Spring Boot</a> y <a href="">Thymeleaf</a>
       </p>

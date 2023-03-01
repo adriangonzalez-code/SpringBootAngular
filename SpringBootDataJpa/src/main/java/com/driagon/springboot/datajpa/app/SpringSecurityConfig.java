@@ -1,5 +1,6 @@
 package com.driagon.springboot.datajpa.app;
 
+import com.driagon.springboot.datajpa.app.auth.handler.LoginSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private LoginSuccessHandler loginSuccessHandler;
 
     @Bean
     public static BCryptPasswordEncoder passwordEncoder() {
@@ -40,8 +44,10 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/factura/**").hasAnyRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
-                .formLogin().loginPage("/login").permitAll()
+                .formLogin().successHandler(loginSuccessHandler).loginPage("/login").permitAll()
                 .and()
-                .logout().permitAll();
+                .logout().permitAll()
+                .and()
+                .exceptionHandling().accessDeniedPage("/error_403");
     }
 }
