@@ -13,11 +13,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -44,6 +48,7 @@ public class ClienteController {
     @Autowired
     private IUploadFileService uploadFileService;
 
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @GetMapping(value = "/ver/{id}")
     public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
         //Cliente cliente = this.clienteService.findOne(id);
@@ -61,7 +66,7 @@ public class ClienteController {
     }
 
     @RequestMapping(value = {"/listar", "/", ""}, method = RequestMethod.GET)
-    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model, Authentication authentication) {
+    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model, Authentication authentication, HttpServletRequest request) {
 
         if (authentication != null) {
             logger.info("Hola usuario autenticado, tu username es: {}", authentication.getName());
@@ -79,6 +84,20 @@ public class ClienteController {
             logger.info("Hola {} no tienes acceso!", auth.getName());
         }
 
+        SecurityContextHolderAwareRequestWrapper securityContext = new SecurityContextHolderAwareRequestWrapper(request, "ROLE_");
+
+        if (securityContext.isUserInRole("ADMIN")) {
+            logger.info("Forma usando SecurityContextHolderAwareRequestWrapper: Hola ".concat(auth.getName()).concat(" tienes acceso"));
+        } else {
+            logger.info("Forma usando SecurityContextHolderAwareRequestWrapper: Hola ".concat(auth.getName()).concat(" NO tienes acceso"));
+        }
+
+        if (request.isUserInRole("ROLE_ADMIN")) {
+            logger.info("Forma usando HttpServletRequest: Hola ".concat(auth.getName()).concat(" tienes acceso"));
+        } else {
+            logger.info("Forma usando HttpServletRequest: Hola ".concat(auth.getName()).concat(" NO tienes acceso"));
+        }
+
         Pageable pageRequest = PageRequest.of(page, 5);
         Page<Cliente> clientes = this.clienteService.findAll(pageRequest);
 
@@ -90,6 +109,7 @@ public class ClienteController {
         return "listar";
     }
 
+    @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/form", method = RequestMethod.GET)
     public String crear(Map<String, Object> model) {
         Cliente cliente = new Cliente();
@@ -98,6 +118,7 @@ public class ClienteController {
         return "form";
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping(value = "/uploads/{filename:.+}")
     public ResponseEntity<Resource> verFoto(@PathVariable String filename) {
 
@@ -110,6 +131,7 @@ public class ClienteController {
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + recurso.getFilename() + "\"").body(recurso);
     }
 
+    @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/form", method = RequestMethod.POST)
     public String guardar(@Valid Cliente cliente, BindingResult result, Model model, SessionStatus status, @RequestParam(value = "file", required = false) MultipartFile foto, RedirectAttributes flash) {
         if (result.hasErrors()) {
@@ -142,6 +164,7 @@ public class ClienteController {
         return "redirect:/listar";
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = "/form/{id}", method = RequestMethod.GET)
     public String editar(@PathVariable Long id, Map<String, Object> model, RedirectAttributes flash) {
 
@@ -164,6 +187,7 @@ public class ClienteController {
         return "form";
     }
 
+    @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/eliminar/{id}")
     public String eliminar(@PathVariable Long id, RedirectAttributes flash) {
         if (id > 0) {
