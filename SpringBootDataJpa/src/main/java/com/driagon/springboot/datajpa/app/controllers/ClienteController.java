@@ -7,6 +7,7 @@ import com.driagon.springboot.datajpa.app.util.paginator.PageRender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +35,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 
 @Controller
@@ -48,25 +50,11 @@ public class ClienteController {
     @Autowired
     private IUploadFileService uploadFileService;
 
-    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    @GetMapping(value = "/ver/{id}")
-    public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
-        //Cliente cliente = this.clienteService.findOne(id);
-
-        Cliente cliente = this.clienteService.fetchByIdWithFacturas(id);
-
-        if (cliente == null) {
-            flash.addFlashAttribute("error", "El cliente no existe en la Base de Datos");
-            return "redirect:/listar";
-        }
-
-        model.put("cliente", cliente);
-        model.put("titulo", "Detalle cliente: " + cliente.getNombre());
-        return "ver";
-    }
+    @Autowired
+    private MessageSource messageSource;
 
     @RequestMapping(value = {"/listar", "/", ""}, method = RequestMethod.GET)
-    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model, Authentication authentication, HttpServletRequest request) {
+    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model, Authentication authentication, HttpServletRequest request, Locale locale) {
 
         if (authentication != null) {
             logger.info("Hola usuario autenticado, tu username es: {}", authentication.getName());
@@ -102,18 +90,35 @@ public class ClienteController {
         Page<Cliente> clientes = this.clienteService.findAll(pageRequest);
 
         PageRender<Cliente> pageRender = new PageRender<>("/listar", clientes);
-        model.addAttribute("titulo", "Listado de Clientes");
+        model.addAttribute("titulo", messageSource.getMessage("text.cliente.titulo", null, locale));
         model.addAttribute("clientes", clientes);
         model.addAttribute("page", pageRender);
 
         return "listar";
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    @GetMapping(value = "/ver/{id}")
+    public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash, Locale locale) {
+        //Cliente cliente = this.clienteService.findOne(id);
+
+        Cliente cliente = this.clienteService.fetchByIdWithFacturas(id);
+
+        if (cliente == null) {
+            flash.addFlashAttribute("error", messageSource.getMessage("text.not-found.cliente.error", null, locale));
+            return "redirect:/listar";
+        }
+
+        model.put("cliente", cliente);
+        model.put("titulo", messageSource.getMessage("text.cliente.detalle.titulo", null, locale).concat(" ").concat(cliente.getNombre()));
+        return "ver";
+    }
+
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/form", method = RequestMethod.GET)
-    public String crear(Map<String, Object> model) {
+    public String crear(Map<String, Object> model, Locale locale) {
         Cliente cliente = new Cliente();
-        model.put("titulo", "Formulario de Clientes");
+        model.put("titulo", messageSource.getMessage("text.cliente.ver.titulo", null, locale));
         model.put("cliente", cliente);
         return "form";
     }
@@ -133,9 +138,9 @@ public class ClienteController {
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/form", method = RequestMethod.POST)
-    public String guardar(@Valid Cliente cliente, BindingResult result, Model model, SessionStatus status, @RequestParam(value = "file", required = false) MultipartFile foto, RedirectAttributes flash) {
+    public String guardar(@Valid Cliente cliente, BindingResult result, Model model, SessionStatus status, @RequestParam(value = "file", required = false) MultipartFile foto, RedirectAttributes flash, Locale locale) {
         if (result.hasErrors()) {
-            model.addAttribute("titulo", "Formulario de Clientes");
+            model.addAttribute("titulo", messageSource.getMessage("text.cliente.ver.titulo", null, locale));
             return "form";
         }
 
@@ -151,12 +156,12 @@ public class ClienteController {
             } catch (IOException e) {
             }
 
-            flash.addFlashAttribute("info", "Has subido correctamente '" + uniqueFileName + "'");
+            flash.addFlashAttribute("info", messageSource.getMessage("text.upload-file.success", null, locale) + uniqueFileName);
 
             cliente.setFoto(uniqueFileName);
         }
 
-        String mensajeFlash = (cliente.getId() != null) ? "Cliente editado con éxito" : "Cliente creado con éxito";
+        String mensajeFlash = (cliente.getId() != null) ? messageSource.getMessage("text.cliente.editado.success", null, locale) : messageSource.getMessage("text.cliente.creado.success", null, locale);
 
         this.clienteService.save(cliente);
         status.setComplete();
@@ -166,22 +171,22 @@ public class ClienteController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = "/form/{id}", method = RequestMethod.GET)
-    public String editar(@PathVariable Long id, Map<String, Object> model, RedirectAttributes flash) {
+    public String editar(@PathVariable Long id, Map<String, Object> model, RedirectAttributes flash, Locale locale) {
 
         Cliente cliente = null;
 
         if (id > 0) {
             cliente = this.clienteService.findOne(id);
             if (cliente == null) {
-                flash.addFlashAttribute("error", "El id del cliente no existe en la BBDD!");
+                flash.addFlashAttribute("error", messageSource.getMessage("text.id-not-found.cliente.error", null, locale));
                 return "redirect:/listar";
             }
         } else {
-            flash.addFlashAttribute("error", "El id del cliente no puede ser cero");
+            flash.addFlashAttribute("error", messageSource.getMessage("text.id-invalid.cliente.error", null, locale));
             return "redirect:/listar";
         }
 
-        model.put("titulo", "Editar Cliente");
+        model.put("titulo", messageSource.getMessage("text.cliente.editar.titulo", null, locale));
         model.put("cliente", cliente);
 
         return "form";
@@ -189,15 +194,15 @@ public class ClienteController {
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/eliminar/{id}")
-    public String eliminar(@PathVariable Long id, RedirectAttributes flash) {
+    public String eliminar(@PathVariable Long id, RedirectAttributes flash, Locale locale) {
         if (id > 0) {
             Cliente cliente = this.clienteService.findOne(id);
 
             this.clienteService.delete(id);
-            flash.addFlashAttribute("success", "Cliente eliminado con éxito");
+            flash.addFlashAttribute("success", messageSource.getMessage("text.cliente.eliminado.success", null, locale));
 
             if (this.uploadFileService.delete(cliente.getFoto())) {
-                flash.addFlashAttribute("info", "Foto " + cliente.getFoto() + " eliminada con éxito");
+                flash.addFlashAttribute("info", String.format(messageSource.getMessage("text.foto.elminado.success", null, locale), cliente.getFoto()));
             }
         }
 

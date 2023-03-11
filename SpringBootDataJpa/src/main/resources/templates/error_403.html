@@ -5,10 +5,10 @@
     <header th:replace="layout/layout :: header"></header>
     <div class="container py-4">
       <div class="card bg-danger text-white">
-        <div class="card-header">Error: Acceso Denegado!</div>
+        <div class="card-header" th:text="#{text.denied.access}"></div>
         <div class="card-body">
-          <h5 class="card-title">Lo sentimos <span th:text="${#authentication.name}"></span>, No tiene permisos para acceder a este recurso.</h5>
-          <a th:href="@{/listar}" class="btn btn-outline-light" role="button">Ir al inicio</a>
+          <h5 class="card-title" th:utext="#{text.denied.access.sorry} + ' <span>' + ${#authentication.name} + '</span>' + #{text.denied.access.mensaje}"></h5>
+          <a th:href="@{/listar}" class="btn btn-outline-light" role="button" th:text="#{text.denied.access.inicio}"></a>
         </div>
       </div>
     </div>
