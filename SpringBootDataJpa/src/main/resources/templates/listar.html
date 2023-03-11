@@ -3,6 +3,7 @@
   <head th:replace="layout/layout :: head">
   </head>
   <body>
+    <div id="i18n_eliminar_cliente" th:text="#{text.confimacion.eliminar.customer}" style="display: none;"></div>
     <header th:replace="layout/layout :: header"></header>
 
     <div class="container py-4">
@@ -38,7 +39,7 @@
                 <a class="btn btn-success btn-xs" th:href="@{'/factura/form/' + ${cliente.id}}" th:text="#{text.boton.factura.crear}"></a>
               </td>
               <td sec:authorize="hasRole('ROLE_ADMIN')"><a th:href="@{/form/} + ${cliente.id}" th:text="#{text.boton.factura.editar}" class="btn btn-primary btn-xs"></a></td>
-              <td sec:authorize="hasRole('ROLE_ADMIN')"><a th:href="@{/eliminar/} + ${cliente.id}" th:text="#{text.boton.factura.eliminar}" class="btn btn-danger btn-xs" th:onclick="return confirm(#{text.confimacion.eliminar.customer});"></a></td>
+              <td sec:authorize="hasRole('ROLE_ADMIN')"><a th:href="@{/eliminar/} + ${cliente.id}" th:text="#{text.boton.factura.eliminar}" class="btn btn-danger btn-xs" onclick="return confirm(document.getElementById('i18n_eliminar_cliente').innerHTML);"></a></td>
             </tr>
             </tbody>
           </table>

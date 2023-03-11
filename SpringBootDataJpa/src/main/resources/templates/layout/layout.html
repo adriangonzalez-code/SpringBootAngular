@@ -66,14 +66,10 @@
       <hr>
       <img th:src="@{/images/spring.png}" alt="" class="img img-thumbnail" style="width: 5%">
       <p sec:authorize="isAuthenticated()">
-        Usuario logeado: <span sec:authentication="name"></span> | Roles: <span sec:authentication="principal.authorities"></span>
+        <span th:utext="#{text.security.logged-user}">: </span> <span sec:authentication="name"></span> | <span th:text="#{text.security.roles-user}"></span>: <span sec:authentication="principal.authorities"></span>
       </p>
-      <p>
-        Powered by <a href="">Spring Boot</a> y <a href="">Thymeleaf</a>
-      </p>
-      <p>
-        Este proyecto
-      </p>
+      <p th:utext="#{text.footer.titulo}"></p>
+      <p th:utext="#{text.footer.mensaje}"></p>
 
       <script th:src="@{/js/jquery.min.js}"></script>
       <script th:src="@{/js/poper.min.js}"></script>
