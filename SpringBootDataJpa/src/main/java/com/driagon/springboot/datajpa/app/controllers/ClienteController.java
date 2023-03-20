@@ -4,6 +4,7 @@ import com.driagon.springboot.datajpa.app.models.entity.Cliente;
 import com.driagon.springboot.datajpa.app.models.service.IClienteService;
 import com.driagon.springboot.datajpa.app.models.service.IUploadFileService;
 import com.driagon.springboot.datajpa.app.util.paginator.PageRender;
+import com.driagon.springboot.datajpa.app.view.xml.ClienteList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
