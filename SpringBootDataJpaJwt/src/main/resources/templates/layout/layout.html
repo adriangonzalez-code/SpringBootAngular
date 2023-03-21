@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+  <head th:fragment="head">
+      <meta charset="UTF-8" />
+      <title th:text="'Spring Boot : MVC + Thymeleaf + Data JPA - ' + ${titulo}"></title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/jquery-ui.min.css}">
+  </head>
+  <body>
+    <header th:fragment="header">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Navbar</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/listar}" th:text="#{text.link.cliente}"></a>
+            </li>
+          </ul>
+          <ul class="navbar-nav navbar-right">
+            <li sec:authorize="!isAuthenticated()">
+              <a th:href="@{/login}" class="btn btn-outline-primary" th:text="#{text.link.sign-in}"></a>
+            </li>
+            <li sec:authorize="isAuthenticated()" class="dropdown">
+              <button class="btn btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false" sec:authentication="name"></button>
+              <div class="dropdown-menu">
+                <form id="logoutForm" th:action="@{/logout}" method="post">
+                  <buttton type="submit" class="dropdown-item" onclick="document.getElementById('logoutForm').submit();" th:text="#{text.link.sign-out}"></buttton>
+                </form>
+              </div>
+            </li>
+          </ul>
+          <ul class="navbar-nav navbar-right mx-4">
+            <li class="nav-item mx-1">
+              <a class="btn btn-outline-success" th:href="@{/locale(lang=es_ES)}" th:text="#{text.locale.es}"></a>
+            </li>
+            <li class="nav-item mx-1">
+              <a class="btn btn-outline-success" th:href="@{/locale(lang=en_US)}" th:text="#{text.locale.en}"></a>
+            </li>
+            <li class="nav-item mx-1">
+              <a class="btn btn-outline-success" th:href="@{/locale(lang=de_DE)}" th:text="#{text.locale.de}"></a>
+            </li>
+            <li class="nav-item dropdown show mx-2">
+              <button class="btn btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                <span th:text="#{text.locale.language}"></span>
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" th:href="@{/locale(lang=es_ES)}" th:text="#{text.locale.es}"></a>
+                <a class="dropdown-item" th:href="@{/locale(lang=en_US)}" th:text="#{text.locale.en}"></a>
+                <a class="dropdown-item" th:href="@{/locale(lang=de_DE)}" th:text="#{text.locale.de}"></a>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <div th:if="${success != null}" class="alert alert-success" th:text="${success}"></div>
+      <div th:if="${error != null}" class="alert alert-danger" th:text="${error}"></div>
+      <div th:if="${warning != null}" class="alert alert-warning" th:text="${warning}"></div>
+      <div th:if="${info != null}" class="alert alert-info" th:text="${info}"></div>
+    </header>
+    <div class="container"></div>
+    <footer th:fragment="footer" class="container">
+      <hr>
+      <img th:src="@{/images/spring.png}" alt="" class="img img-thumbnail" style="width: 5%">
+      <p sec:authorize="isAuthenticated()">
+        <span th:utext="#{text.security.logged-user}">: </span> <span sec:authentication="name"></span> | <span th:text="#{text.security.roles-user}"></span>: <span sec:authentication="principal.authorities"></span>
+      </p>
+      <p th:utext="#{text.footer.titulo}"></p>
+      <p th:utext="#{text.footer.mensaje}"></p>
+
+      <script th:src="@{/js/jquery.min.js}"></script>
+      <script th:src="@{/js/poper.min.js}"></script>
+      <script th:src="@{/js/bootstrap.min.js}"></script>
+      <script th:src="@{/js/jquery-ui.min.js}"></script>
+    </footer>
+  </body>
+</html>
