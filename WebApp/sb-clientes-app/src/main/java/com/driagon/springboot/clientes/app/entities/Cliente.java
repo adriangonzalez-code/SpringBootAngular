@@ -1,6 +1,9 @@
 package com.driagon.springboot.clientes.app.entities;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -15,13 +18,18 @@ public class Cliente implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "nombre")
+    @NotEmpty(message = "No puede estar vacio")
+    @Size(min = 4, max = 12, message = "El tamaño debe estar entre 4 y 12 caracteres")
+    @Column(name = "nombre", nullable = false)
     private String nombre;
 
+    @NotEmpty(message = "No puede estar vacio")
     @Column(name = "apellido")
     private String apellido;
 
-    @Column(name = "email")
+    @NotEmpty(message = "No puede estar vacio")
+    @Email(message = "No es una dirección de correo válida")
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "create_at")
